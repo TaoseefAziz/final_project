@@ -141,7 +141,7 @@ if __name__ == "__main__":
     # devices_new_df.to_csv(DEVICE_URLS_FILE,index=False)
 
     devices_new_df = pd.read_csv(DEVICE_URLS_FILE)
-    all_columns=["manufacturer","device","url","Network_Technology","Network_2G bands","Network_GPRS",
+    all_columns=["manufacturer","device","Network_Technology","Network_2G bands","Network_GPRS",
     "Network_EDGE","Launch_Announced","Launch_Status","Body_Dimensions","Body_Weight","Body_SIM","Body_","Display_Type","Display_Size",
     "Display_Resolution","Platform_OS","Platform_Chipset","Platform_CPU","Memory_Card slot","Memory_Internal","Main Camera_Single",
     "Main Camera_Video","Selfie camera_Single","Selfie camera_Video","Sound_Loudspeaker ","Sound_3.5mm jack ","Comms_WLAN","Comms_Bluetooth",
