@@ -3,114 +3,154 @@ import time
 from bs4 import BeautifulSoup
 import pandas as pd
 
-req_interval = 2
+REQ_INTERVAL = 0
+RESTRICT_NUM_MAN = 122
+GARBAGE_MANF_URLS = 19
+GARBAGE_DEV_URLS = 23
+TOTAL_MANUFACTURERS = 122
+NUM_DEVICES_PER_MANF = 15
+ROOT_URL = "https://www.gsmarena.com/makers.php3"
 
-def get_manufacturers():
-    url = "https://www.gsmarena.com/makers.php3"
+MANUFACTURERS_URLS_FILE = "man_urls.csv"
+POP_URLS_FILE = "pop_urls.csv"
+DEVICE_URLS_FILE = "device_urls.csv"
+SPECIFICATIONS_FILE = "sepcifications.csv"
 
-    time.sleep(req_interval)
-    response = requests.get(url)
+def get_gsmarena_manufacturers(root_url, existing_df):
+    new_df = pd.DataFrame(columns=['manufacturer', 'url'])
+
+    response = requests.get(root_url)
+    assert response.status_code == 200
 
     soup = BeautifulSoup(response.text, 'html.parser')
-
-    manufacturer_urls = {}
     all_urls = soup.find_all('a')
+
     i = 0
     for link in all_urls:
         href = link.get('href')
-        if 19 < i < 122 + 19 + 1: # 19 garbage urls, 122 manufacturers
-            if href != None and 'php' in href:
-                phone_manufacturer = href.split('-')[0]
-                manufacturer_urls[phone_manufacturer] = f"https://www.gsmarena.com/{href}"
+        if GARBAGE_MANF_URLS < i < TOTAL_MANUFACTURERS + GARBAGE_MANF_URLS + 1 and \
+        href != None and 'php' in href:
+            manufacturer = href.split('-')[0]
+
+            # Check to see if this is already in the dataframe
+            if not ( existing_df['manufacturer'].eq(manufacturer)).any():
+                full_url = f"https://www.gsmarena.com/{href}"
+                new_df.loc[len(new_df)] = (manufacturer, full_url)
         i += 1
 
-    return manufacturer_urls
+    return new_df
 
-def get_popular_sorted_pages(manufacturer_urls):
-
-    popular_page_urls = {}
-    num_manufacturers = 2
+def get_pop_pages(man_urls_df, old_pop_df):
+    new_df = pd.DataFrame(columns=['manufacturer', 'url'])
 
     i = 0
-    for manufacturer, url in manufacturer_urls.items():
-        if i < num_manufacturers:
-
-            time.sleep(req_interval)
+    for index in man_urls_df.index:
+        manufacturer = man_urls_df['manufacturer'][index]
+        url = man_urls_df['url'][index]
+        if i < RESTRICT_NUM_MAN and not ( old_pop_df['manufacturer'].eq(manufacturer)).any():
+            
+            time.sleep(REQ_INTERVAL)
             response = requests.get(url)
+            assert response.status_code == 200
 
             soup = BeautifulSoup(response.text, 'html.parser')
             sortby_popularity_url = soup.find("i",class_="head-icon icon-popularity").parent.get('href')
-            popular_page_urls[manufacturer] = f"https://www.gsmarena.com/{sortby_popularity_url}"
-            print(f"https://www.gsmarena.com/{sortby_popularity_url}")
-
+            full_url = f"https://www.gsmarena.com/{sortby_popularity_url}"
+            print(f"storing: {manufacturer} {full_url}")
+            new_df.loc[len(new_df)] = (manufacturer, full_url)
         i += 1
+    return new_df
 
-    return popular_page_urls
+def get_popular_devices_all_manufacturers(popular_urls_df, old_devices_df):
+    new_df = pd.DataFrame(columns=['manufacturer', 'device', 'url'])
 
-def get_popular_devices_all_manufacturers(popular_page_urls):
-    devices_df = pd.DataFrame(columns=['manufacturer', 'device', 'url'])
-    manufacturers = 2
-    devices_per_page = 2
-    start_devices = 23 # garbage urls in this many 'a' tags
+    manufacturer_idx = 0
+    
+    for index in popular_urls_df.index:
+        manufacturer = popular_urls_df['manufacturer'][index]
+        url = popular_urls_df['url'][index]
 
-    i = 0
-    for manufacturer, popular_devices_url in popular_page_urls.items():
-        if i < manufacturers:
-
-            time.sleep(req_interval)
-            response = requests.get(popular_devices_url)
+        if manufacturer_idx < RESTRICT_NUM_MAN:
+            time.sleep(REQ_INTERVAL)
+            response = requests.get(url)
+            assert response.status_code == 200
 
             soup = BeautifulSoup(response.text, 'html.parser')
-            popular_devices_lst = []
             all_devices = soup.findAll("a")
 
-            j = 0
+            device_idx = 0
             for device in all_devices:
-                if start_devices < j < start_devices + devices_per_page + 1:
+                if GARBAGE_DEV_URLS < device_idx < GARBAGE_DEV_URLS + NUM_DEVICES_PER_MANF + 1:
                     device_url = device.get("href")
                     device_name = device_url.split('-')[0]
                     full_url = f"https://www.gsmarena.com/{device_url}"
-                    devices_df.loc[len(devices_df)] = (manufacturer, device_name, full_url)
-                j += 1
-        i += 1
+                    new_row = (manufacturer, device_name, full_url)
+                    new_df.loc[len(new_df)] = new_row
+                device_idx += 1
+        manufacturer_idx += 1
 
-    return devices_df
+    return new_df
 
-def get_specifications_for_device(device_url, specifications_df):
-    time.sleep(req_interval)
+def get_specifications_for_device(manufacturer, device, device_url):
+    specifications_dict = {}
+    specifications_dict['manufacturer'] = manufacturer
+    specifications_dict['device'] = device
+
+    time.sleep(REQ_INTERVAL)
     response = requests.get(device_url, headers = {'User-agent': 'bot'})
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    while int(response.status_code) != 200:
+        print("Request unsuccessful")
+        if (response.status_code == 429):
+            print("Too many requests")
+            print(response.headers["Retry-After"])
+        input("Waiting for RETURN to be pressed to continue")
+        return
     
-    if int(response.status_code) == 429:
-        print("Denied for too many requests")
-        print(response.headers["Retry-After"])
-
+    soup = BeautifulSoup(response.text, 'html.parser')
     feature_tables = soup.findAll("table")
 
     for feature_table in feature_tables:
-        feature_class = feature_table.find('th').text
-        feature_names = feature_table.findAll(class_='ttl')
-        feature_values = feature_table.findAll(class_='nfo')
-        for i in range(len(feature_names)):
-            key = feature_class +"_" + feature_names[i].text
-            value = feature_values[i].text
-            specifications_df[key] = value
+        feature_class_header = feature_table.find('th')
+        if (feature_class_header != None):
+            feature_class = feature_class_header.text
+            feature_names = feature_table.findAll(class_='ttl')
+            feature_values = feature_table.findAll(class_='nfo')
+            for i in range(len(feature_names)):
+                key = feature_class +"_" + feature_names[i].text
+                value = feature_values[i].text
+                specifications_dict[key] = value
+                # print(f"writing: {key} --> {value}")
 
-    return feature_tables
+    return specifications_dict
 
 if __name__ == "__main__": 
-    # get urls for all the manufacturers on the site
-    manufacturer_urls = get_manufacturers()
+    # man_urls_old_df = pd.read_csv(MANUFACTURERS_URLS_FILE)
+    # man_urls_new_df = get_gsmarena_manufacturers(ROOT_URL,man_urls_old_df)
+    # man_urls_updated_df = pd.concat([man_urls_old_df, man_urls_new_df])
+    # man_urls_updated_df.to_csv(MANUFACTURERS_URLS_FILE,index=False)
 
-    # get urls for the popular devices for each manufacturer
-    popular_page_urls = get_popular_sorted_pages(manufacturer_urls)
+    # pop_urls_old_df = pd.read_csv(POP_URLS_FILE)  
+    # pop_urls_new_df = get_pop_pages(man_urls_updated_df, pop_urls_old_df)
+    # pop_urls_updated_df = pd.concat([pop_urls_old_df, pop_urls_new_df])
+    # pop_urls_updated_df.to_csv(POP_URLS_FILE,index=False)
 
-    devices_df = get_popular_devices_all_manufacturers(popular_page_urls)
+    # pop_urls_df = pd.read_csv(POP_URLS_FILE)
+    # devices_old_df = pd.read_csv(POP_URLS_FILE)  
+    # devices_new_df = get_popular_devices_all_manufacturers(pop_urls_df, devices_old_df)
+    # devices_new_df.to_csv(DEVICE_URLS_FILE,index=False)
 
-    for index, row in devices_df.iterrows():
-        url = row['url']
-        get_specifications_for_device(url,devices_df)
-    
-    devices_df.to_csv('output_specs.csv')
+    devices_new_df = pd.read_csv(DEVICE_URLS_FILE)
+    all_columns=["manufacturer","device","url","Network_Technology","Network_2G bands","Network_GPRS",
+    "Network_EDGE","Launch_Announced","Launch_Status","Body_Dimensions","Body_Weight","Body_SIM","Body_ ","Display_Type","Display_Size",
+    "Display_Resolution","Platform_OS","Platform_Chipset","Platform_CPU","Memory_Card slot","Memory_Internal","Main Camera_Single",
+    "Main Camera_Video","Selfie camera_Single","Selfie camera_Video","Sound_Loudspeaker ","Sound_3.5mm jack ","Comms_WLAN","Comms_Bluetooth",
+    "Comms_Positioning","Comms_NFC","Comms_Radio","Comms_USB","Features_Sensors","Battery_Type","Battery_Talk time","Misc_Colors","Misc_Price",
+    "Network_3G bands","Network_4G bands","Network_ ","Network_Speed","Platform_GPU","Main Camera_Features","Memory_ ","Misc_Models","Body_Build",
+    "Main Camera_Triple","Selfie camera_Features"]
 
+    for index, row in devices_new_df.iterrows():
+        specifications_df =  pd.DataFrame(columns=all_columns)
+        specs_dict = get_specifications_for_device(row['manufacturer'],row['device'],row['url'])
+        specifications_df.loc[0] = specs_dict
+        specifications_df.to_csv(SPECIFICATIONS_FILE, mode = "a",index=False, header = False)
