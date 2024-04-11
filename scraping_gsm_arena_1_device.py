@@ -14,7 +14,7 @@ ROOT_URL = "https://www.gsmarena.com/makers.php3"
 MANUFACTURERS_URLS_FILE = "man_urls.csv"
 POP_URLS_FILE = "pop_urls.csv"
 DEVICE_URLS_FILE = "device_urls.csv"
-SPECIFICATIONS_FILE = "sepcifications.csv"
+SPECIFICATIONS_FILE = "specifications.csv"
 
 def get_gsmarena_manufacturers(root_url, existing_df):
     new_df = pd.DataFrame(columns=['manufacturer', 'url'])
