@@ -7,5 +7,5 @@ def convert_display_size(df: pd.DataFrame) -> pd.DataFrame:
     area_extractor = regex.extractor_generator(r"(\d+\.\d+) cm2")
     ratio_extractor = regex.extractor_generator(r"\(~(\d+\.\d+)% screen-to-body ratio\)")
 
-    return converter_templates.replace_column(df, "Display_Size", screen_size=size_extractor,
+    return converter_templates.convert_column(df, "Display_Size", screen_size=size_extractor,
                                               area=area_extractor, ratio=ratio_extractor)

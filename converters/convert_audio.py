@@ -9,4 +9,4 @@ def convert_jack(df: pd.DataFrame) -> pd.DataFrame:
 
         return None
 
-    return converter_templates.replace_column(df, "Sound_3.5mm jack ", has_jack=jack_bool)
+    return converter_templates.convert_column(df, "Sound_3.5mm jack ", has_jack=jack_bool)
