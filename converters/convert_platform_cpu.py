@@ -55,10 +55,10 @@ def convert_platform_cpu(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     return new_df
 
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_platform_cpu(specs_df)
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_platform_cpu(specs_df)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

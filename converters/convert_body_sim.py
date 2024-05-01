@@ -25,7 +25,6 @@ def convert_body_sim(source_dataframe: pd.DataFrame) -> pd.DataFrame:
 
     index = iterate_row_start
 
-
     while iterate_row_start <= index < iterate_row_end:
         row = filtered_df.iloc[index]
         new_column_entries = {'num_slots_sim':0,'hybrid_sim':0,'has_mini_sim':0,\
@@ -45,7 +44,8 @@ def convert_body_sim(source_dataframe: pd.DataFrame) -> pd.DataFrame:
             sim_property = column_heading.split('_')[0]
             if sim_property in variant0:
                 new_column_entries[column_heading] = 1
-
+            else:
+                new_column_entries[column_heading] = 0
 
         # print(f"{variant0}")
         # for k, v in new_column_entries.items():
@@ -63,10 +63,10 @@ def convert_body_sim(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     return new_df
 
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_body_sim(specs_df)
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_body_sim(specs_df)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

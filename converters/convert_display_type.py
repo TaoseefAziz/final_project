@@ -28,12 +28,14 @@ def convert_display_type(source_dataframe: pd.DataFrame) -> pd.DataFrame:
         row_data_lst = row_data_str.split(',')
         
         row["display_tech"] = row_data_lst[0]
+        
         if "hz" in row_data_str:
             for entry in row_data_lst:
                 if "hz" in entry:
                     row["display_refresh"] = int(entry[:-2])
         else:
             row["display_refresh"] = 60
+
         new_df.loc[len(new_df)] = row
 
         index += 1
@@ -44,10 +46,10 @@ def convert_display_type(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     return new_df
 
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_display_type(specs_df)
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_display_type(specs_df)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

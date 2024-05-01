@@ -44,12 +44,12 @@ def convert_body_dimensions(source_dataframe: pd.DataFrame) -> pd.DataFrame:
 
     return new_df
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_body_dimensions(specs_df)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_body_dimensions(specs_df)
 
 
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

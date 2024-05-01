@@ -13,7 +13,7 @@ OUTPUT_FILENAME = "converted_platform_os.csv"
 def convert_platform_os(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     source_columns = ["Platform_OS"]
     filtered_df = source_dataframe.dropna(subset=source_columns)
-    new_columns = ['platform_os']
+    new_columns = ['platform_os','platform_os_ver']
     new_df = pd.DataFrame(columns=filtered_df.columns.tolist() + new_columns)
 
     iterate_row_start = 0
@@ -33,8 +33,8 @@ def convert_platform_os(source_dataframe: pd.DataFrame) -> pd.DataFrame:
             index += 1
             continue
 
-        row['platform_os'] = row_data_lst[0] + " " + row_data_lst[1].strip(',')
- 
+        row['platform_os'] = row_data_lst[0]
+        row['platform_os_ver'] = row_data_lst[1].strip(',')
         
         new_df.loc[len(new_df)] = row
 
@@ -46,10 +46,10 @@ def convert_platform_os(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     return new_df
 
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_platform_os(specs_df)
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_platform_os(specs_df)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

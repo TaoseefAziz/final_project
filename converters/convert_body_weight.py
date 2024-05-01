@@ -25,8 +25,8 @@ def convert_body_weight(source_dataframe: pd.DataFrame) -> pd.DataFrame:
         if match:
             row["Body_Weight_g"] = match
             new_df.loc[len(new_df)] = row
-        else:
-            print("No weight found")
+        # else:
+            # print("No weight found")
 
     new_df = new_df.drop(source_columns, axis = 1)
     print(f"Lost: {source_dataframe.shape[0]-new_df.shape[0]} rows when converting Body_Weight")
@@ -34,10 +34,10 @@ def convert_body_weight(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     return new_df
 
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_body_weight(specs_df)
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_body_weight(specs_df)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

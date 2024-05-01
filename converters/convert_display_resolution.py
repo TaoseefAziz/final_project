@@ -10,7 +10,7 @@ import re
 SOURCE_FILE = "specifications.csv"
 OUTPUT_FILENAME = "converted_display_resolution.csv"
 
-def convert_body_sim(source_dataframe: pd.DataFrame) -> pd.DataFrame:
+def convert_display_resolution(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     source_columns = ["Display_Resolution"]
     filtered_df = source_dataframe.dropna(subset=source_columns)
     new_columns = ['display_width_px','display_height_px','display_density']
@@ -47,16 +47,16 @@ def convert_body_sim(source_dataframe: pd.DataFrame) -> pd.DataFrame:
 
         index += 1
 
-    new_df = new_df.drop(source_columns, axis = 1)
+    # new_df = new_df.drop(source_columns, axis = 1)
     print(f"Lost: {source_dataframe.shape[0]-new_df.shape[0]} rows when converting body_sim")
 
     return new_df
 
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_body_sim(specs_df)
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_body_sim(specs_df)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

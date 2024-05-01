@@ -32,9 +32,9 @@ def convert_battery_type(source_dataframe: pd.DataFrame) -> pd.DataFrame:
         new_df.loc[len(new_df)] = row
     new_df = new_df.drop(source_columns, axis = 1)
     return new_df
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_battery_type(specs_df)
-    out_df.to_csv(REMOVED_EMPTY_COLS_FILE, index = False)
-main()
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_battery_type(specs_df)
+#     out_df.to_csv(REMOVED_EMPTY_COLS_FILE, index = False)
+# main()

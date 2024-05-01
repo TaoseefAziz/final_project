@@ -36,12 +36,12 @@ def convert_launch_announced_and_launch_status(source_dataframe: pd.DataFrame) -
     new_df = new_df.drop(source_columns, axis = 1)
     return new_df
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_launch_announced_and_launch_status(specs_df)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_launch_announced_and_launch_status(specs_df)
 
 
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()

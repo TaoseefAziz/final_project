@@ -24,3 +24,4 @@ converted_body_sim.csv
 converted_body_dimensions.csv
 converted_body_.csv
 converted_body_dimensions.csv
+*.pyc

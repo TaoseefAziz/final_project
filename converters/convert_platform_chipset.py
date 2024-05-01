@@ -43,18 +43,18 @@ def convert_platform_chipset(source_dataframe: pd.DataFrame) -> pd.DataFrame:
                 chip_manufacturer_found = True
             if not entry.isalpha():
                 chip_details.append(entry)
-            if '(' in entry:
-                for c in entry:
-                    if c.isnumeric():
-                        chip_node += c
-                if 0 < int(chip_node) < 60:
-                    row['platform_chipset_node'] = int(chip_node)
+            # if '(' in entry:
+            #     for c in entry:
+            #         if c.isnumeric():
+            #             chip_node += c
+            #     if 0 < int(chip_node) < 60:
+            #         row['platform_chipset_node'] = int(chip_node)
 
         row['platform_chipset_manufacturer'] = chip_manufacturer
-        for detail in chip_details:
-            if len(detail) > 2:
-                row['platform_chipset_details'] = detail
-                break
+        # for detail in chip_details:
+        #     if len(detail) > 2:
+        #         row['platform_chipset_details'] = detail
+        #         break
         
         new_df.loc[len(new_df)] = row
 
@@ -66,10 +66,10 @@ def convert_platform_chipset(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     return new_df
 
 
-def main():
-    specs_df = pd.read_csv(SOURCE_FILE)
-    print(specs_df.shape)
-    out_df = convert_platform_chipset(specs_df)
-    out_df.to_csv(OUTPUT_FILENAME, index = False)
+# def main():
+#     specs_df = pd.read_csv(SOURCE_FILE)
+#     print(specs_df.shape)
+#     out_df = convert_platform_chipset(specs_df)
+#     out_df.to_csv(OUTPUT_FILENAME, index = False)
 
-main()
+# main()
