@@ -34,8 +34,8 @@ import convert_battery_type
 import pandas as pd
 pd.options.mode.chained_assignment = None
 
-SOURCE_FILE = "specifications.csv"
-OUTPUT_FILENAME = "converted_all_taoseef.csv"
+SOURCE_FILE = "specifications_extended.csv"
+OUTPUT_FILENAME = "converted_all_taoseef_extended.csv"
 
 def main():
     specs_df = pd.read_csv(SOURCE_FILE)

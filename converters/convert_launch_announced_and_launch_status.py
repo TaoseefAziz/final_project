@@ -21,7 +21,7 @@ def convert_launch_announced_and_launch_status(source_dataframe: pd.DataFrame) -
         if launch_announced_lst[0].isnumeric():
             announced_year = int(launch_announced_lst[0])
         status_year = 1970
-        if "Released" in launch_status_lst:
+        if "Exp" not in launch_status_lst and "Released" in launch_status_lst:
             status_year = int(launch_status_lst[2])
         max_year = max(announced_year, status_year)
         row['Launch_year'] = max_year

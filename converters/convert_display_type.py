@@ -10,6 +10,13 @@ import re
 SOURCE_FILE = "specifications.csv"
 OUTPUT_FILENAME = "converted_display_type.csv"
 
+def build_hz_num(string):
+    ret = ""
+    for c in string:
+        if c in "0123456789":
+            ret += c
+    return ret
+
 def convert_display_type(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     source_columns = ["Display_Type"]
     filtered_df = source_dataframe.dropna(subset=source_columns)
@@ -32,7 +39,7 @@ def convert_display_type(source_dataframe: pd.DataFrame) -> pd.DataFrame:
         if "hz" in row_data_str:
             for entry in row_data_lst:
                 if "hz" in entry:
-                    row["display_refresh"] = int(entry[:-2])
+                    row["display_refresh"] = build_hz_num(entry[:-2])
         else:
             row["display_refresh"] = 60
 

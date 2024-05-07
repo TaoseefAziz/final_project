@@ -2,19 +2,21 @@ import requests
 import time
 from bs4 import BeautifulSoup
 import pandas as pd
+import os
 
 REQ_INTERVAL = 0
 RESTRICT_NUM_MAN = 122
 GARBAGE_MANF_URLS = 19
 GARBAGE_DEV_URLS = 23
 TOTAL_MANUFACTURERS = 122
-NUM_DEVICES_PER_MANF = 15
+NUM_DEVICES_PER_MANF = 150
+
 ROOT_URL = "https://www.gsmarena.com/makers.php3"
 
 MANUFACTURERS_URLS_FILE = "man_urls.csv"
 POP_URLS_FILE = "pop_urls.csv"
-DEVICE_URLS_FILE = "device_urls.csv"
-SPECIFICATIONS_FILE = "specifications.csv"
+DEVICE_URLS_FILE = "device_urls_filtered.csv"
+SPECIFICATIONS_FILE = "specifications_extended.csv"
 
 def get_gsmarena_manufacturers(root_url, existing_df):
     new_df = pd.DataFrame(columns=['manufacturer', 'url'])
@@ -80,12 +82,18 @@ def get_popular_devices_all_manufacturers(popular_urls_df, old_devices_df):
 
             device_idx = 0
             for device in all_devices:
-                if GARBAGE_DEV_URLS < device_idx < GARBAGE_DEV_URLS + NUM_DEVICES_PER_MANF + 1:
+                found_end = False
+                if not found_end and GARBAGE_DEV_URLS < device_idx < GARBAGE_DEV_URLS + NUM_DEVICES_PER_MANF + 1:
                     device_url = device.get("href")
-                    device_name = device_url.split('-')[0]
-                    full_url = f"https://www.gsmarena.com/{device_url}"
-                    new_row = (manufacturer, device_name, full_url)
-                    new_df.loc[len(new_df)] = new_row
+                    if device_url == "#":
+                        found_end = True
+                        continue
+                    if device_url != None:
+                        print(device_url)
+                        device_name = device_url.split('-')[0]
+                        full_url = f"https://www.gsmarena.com/{device_url}"
+                        new_row = (manufacturer, device_name, full_url)
+                        new_df.loc[len(new_df)] = new_row
                 device_idx += 1
         manufacturer_idx += 1
 
@@ -96,7 +104,8 @@ def get_specifications_for_device(manufacturer, device, device_url):
     specifications_dict['manufacturer'] = manufacturer
     specifications_dict['device'] = device
 
-    time.sleep(REQ_INTERVAL)
+    # time.sleep(REQ_INTERVAL)
+
     response = requests.get(device_url, headers = {'User-agent': 'bot'})
 
     while int(response.status_code) != 200:
@@ -104,7 +113,10 @@ def get_specifications_for_device(manufacturer, device, device_url):
         if (response.status_code == 429):
             print("Too many requests")
             print(response.headers["Retry-After"])
-        input("Waiting for RETURN to be pressed to continue")
+        print("sleeping for 5min")
+        time.sleep(300)
+        # input("Waiting for RETURN to be pressed to continue")
+        print("Working")
         return
     
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -140,7 +152,8 @@ if __name__ == "__main__":
     # devices_new_df = get_popular_devices_all_manufacturers(pop_urls_df, devices_old_df)
     # devices_new_df.to_csv(DEVICE_URLS_FILE,index=False)
 
-    devices_new_df = pd.read_csv(DEVICE_URLS_FILE)
+    # devices_new_df = pd.read_csv(DEVICE_URLS_FILE)
+
     all_columns=["manufacturer","device","Network_Technology","Network_2G bands","Network_GPRS",
     "Network_EDGE","Launch_Announced","Launch_Status","Body_Dimensions","Body_Weight","Body_SIM","Body_","Display_Type","Display_Size",
     "Display_Resolution","Platform_OS","Platform_Chipset","Platform_CPU","Memory_Card slot","Memory_Internal","Main Camera_Single",
@@ -149,10 +162,21 @@ if __name__ == "__main__":
     "Network_3G bands","Network_4G bands","Network_","Network_Speed","Platform_GPU","Main Camera_Features","Memory_","Misc_Models","Body_Build",
     "Main Camera_Triple","Selfie camera_Features"]
 
-    start = 1491
-    for index, row in devices_new_df.iterrows():
-        if index > start:
-            specifications_df =  pd.DataFrame(columns=all_columns)
-            specs_dict = get_specifications_for_device(row['manufacturer'],row['device'],row['url'])
-            specifications_df.loc[0] = specs_dict
-            specifications_df.to_csv(SPECIFICATIONS_FILE, mode = "a",index=False, header = False)
+
+
+    # start = -1 + 4128
+    # for index, row in devices_new_df.iterrows():
+    #     if index > start:
+      
+    #         print(f"\trequest ({index}): ")
+    #         print("\t"+row['url'])
+    #         try:
+    #             specifications_df =  pd.DataFrame(columns=all_columns)
+    #             specifications_df = specifications_df.drop_duplicates(keep='first')
+    #             specs_dict = get_specifications_for_device(row['manufacturer'],row['device'],row['url'])
+    #             specifications_df.loc[0] = specs_dict
+    #             specifications_df.to_csv(SPECIFICATIONS_FILE, mode = "a",index=False, header = False)
+    #         except Exception as e:
+    #             print(e)
+    #             specifications_df.to_csv(SPECIFICATIONS_FILE, mode = "a",index=False, header = False)
+    #             os._exit(0)

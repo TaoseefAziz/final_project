@@ -3,6 +3,14 @@ import pandas as pd
 SOURCE_FILE = "specifications.csv"
 OUTPUT_FILENAME = "converted_body_dimensions.csv"
 
+def is_float(string):
+    if not isinstance(string, str):
+        return False
+    for c in string:
+        if c not in "0123456789.":
+            return False
+    return True
+
 def convert_body_dimensions(source_dataframe: pd.DataFrame) -> pd.DataFrame:
     source_columns = ["Body_Dimensions"]
     print(f"before converting  using columns = {source_columns} size = {source_dataframe.shape}")
@@ -19,8 +27,8 @@ def convert_body_dimensions(source_dataframe: pd.DataFrame) -> pd.DataFrame:
 
         if len(body_dimensions_mm_only.split("x")) == 3:
             each_dimension_lst = body_dimensions_mm_only.split("x")
-            length_mm = float(each_dimension_lst[0].strip())
-            width_mm = float(each_dimension_lst[1].strip())
+            length_mm = float(each_dimension_lst[0].strip().strip("mm").strip())
+            width_mm = float(each_dimension_lst[1].strip().strip("mm").strip())
             depth_mm = -1
 
             depth = each_dimension_lst[2]
@@ -30,7 +38,7 @@ def convert_body_dimensions(source_dataframe: pd.DataFrame) -> pd.DataFrame:
                 depth_lo = float(depth_lo_hi[0].strip())
                 depth_hi = float(depth_lo_hi[1].strip())
                 depth_mm = round(( depth_lo + depth_hi ) / 2, 1)
-            else:
+            elif is_float(depth_mm):
                 depth_mm = float(depth_parsed)
 
             row["Body_length_mm"] = length_mm
