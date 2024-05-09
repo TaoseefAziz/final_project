@@ -1,7 +1,7 @@
 import pandas as pd
 
-SOURCE_FILE = "converted_all_taoseef_extended_dropped.csv"
-OUTPUT_FILENAME = "converted_all_taoseef_extended_dropped.csv"
+SOURCE_FILE = "final_converted_out.csv"
+OUTPUT_FILENAME = "final_converted_out_dropped.csv"
 
 def main():
     specs_df = pd.read_csv(SOURCE_FILE)

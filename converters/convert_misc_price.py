@@ -37,13 +37,23 @@ def convert_price(df: pd.DataFrame) -> pd.DataFrame:
 
         if price_str.startswith("About"):
             match = about_regex.search(price_str)
-
-            amount_str = match.group(1)
-            symbol = match.group(2)
+            if match:
+                amount_str = match.group(1)
+                symbol = match.group(2)
+            else:
+                return 0
         else:
             match = currency_regex.search(price_str)
-            symbol = match.group(1)
-            amount_str = match.group(2)
+            if match:
+                symbol = match.group(1)
+
+                for k in CONVERSIONS.keys():
+                    if k in symbol:
+                        symbol = k
+                amount_str = match.group(2)
+            else:
+                return 0
+          
 
         amount = float(amount_str.replace(",", ""))
 
